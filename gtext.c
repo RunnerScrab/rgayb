@@ -1,5 +1,17 @@
 #include "gtext.h"
 
+int GayText_AllocateColorTable(struct GayText* tm, size_t length)
+{
+	tm->color_table = (union rgb*) malloc(sizeof(union rgb) * length);
+	memset(tm->color_table, 0, sizeof(union rgb) * length);
+	return tm->color_table ? 0 : -1;
+}
+
+void GayText_FreeColorTable(struct GayText* tm)
+{
+	free(tm->color_table);
+}
+
 void GayText_ScanTextFile(struct GayText* tm, const char* text, const size_t textlen)
 {
 	size_t idx = 0;
@@ -9,7 +21,7 @@ void GayText_ScanTextFile(struct GayText* tm, const char* text, const size_t tex
 		char* p = strchr(&text[idx], '\n');
 		if(p)
 		{
-			size_t linelen = p - &text[idx];
+			size_t linelen = (p - &text[idx]);
 			if(tm->longest_line < linelen)
 			{
 				tm->longest_line = linelen;
@@ -57,6 +69,16 @@ static int CreateANSI24BitCode(union rgb* color, TextGayness gayness, char* outp
 	}
 }
 
+void GayText_PopulateColorTable(struct GayText* tm, TextGayness gayness)
+{
+	union rgb* ct = tm->color_table;
+	size_t idx = 0, len = tm->longest_line;
+	for(; idx < len; ++idx)
+	{
+		hsv_to_rgb(&ct[idx], len, idx);
+	}
+}
+
 int GayText_MakeTextGay(struct GayText* tm, const char* text, const size_t textlen,
 			cv_t* output, TextGayness gayness)
 {
@@ -64,15 +86,12 @@ int GayText_MakeTextGay(struct GayText* tm, const char* text, const size_t textl
 	size_t longest_line = tm->longest_line;
 	char code[128] = {0};
 	int codelen = 0;
-
+	GayText_AllocateColorTable(tm, tm->longest_line);
+	GayText_PopulateColorTable(tm, gayness);
+	union rgb* ct = tm->color_table;
 	for(; idx < textlen; ++idx, ++lineidx)
 	{
-		union rgb color;
 		char ch = text[idx];
-		hsv_to_rgb(&color, longest_line,
-			gayness == GAY ? (idx % longest_line) :
-			lineidx);
-
 		if(ch == '\n')
 		{
 			lineidx = 0;
@@ -80,7 +99,8 @@ int GayText_MakeTextGay(struct GayText* tm, const char* text, const size_t textl
 		}
 		else
 		{
-			codelen = CreateANSI24BitCode(&color, gayness, code, 128);
+			codelen = CreateANSI24BitCode(&ct[gayness == GAY ? (idx % longest_line) :
+							 (lineidx % longest_line)], gayness, code, 128);
 		}
 		if(codelen < 0)
 		{
@@ -96,7 +116,7 @@ int GayText_MakeTextGay(struct GayText* tm, const char* text, const size_t textl
 	//take effect, apparently
 	cv_push(output, '\n');
 	cv_push(output, 0);
-
+	GayText_FreeColorTable(tm);
 	return 0;
 }
 
@@ -122,11 +142,10 @@ void GayText_PrepareText(struct GayText* tm, const char* text, size_t textlen, c
 		case '\t':
 		{
 			size_t tabidx = 0;
-			for(; tabidx < 3; ++tabidx)
+			for(; tabidx < 3; ++tabidx, ++lineidx)
 			{
 				cv_push(out, ' ');
 			}
-			lineidx += tabidx;
 		}
 		break;
 		default:

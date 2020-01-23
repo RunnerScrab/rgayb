@@ -59,7 +59,7 @@ int main(int argc, char** argv)
 	size_t filelen = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 
-	char* text = malloc(sizeof(char) * (filelen + 1));
+	char* text = (char*) malloc(sizeof(char) * (filelen + 1));
 	if(!text)
 	{
 		const char* errormsg = "Couldn't allocate enough memory.\n";
@@ -67,6 +67,7 @@ int main(int argc, char** argv)
 		free(text);
 		return -1;
 	}
+	memset(text, 0, sizeof(char) * (filelen + 1));
 
 	if(fread(text, sizeof(char), filelen, fp) != filelen)
 	{
@@ -75,23 +76,22 @@ int main(int argc, char** argv)
 		write(2, errormsg, strlen(errormsg));
 		return -1;
 	}
-	text[filelen + 1] = 0;
-
+	text[filelen] = 0;
 	struct GayText tm;
 	memset(&tm, 0, sizeof(struct GayText));
 
 
-	GayText_ScanTextFile(&tm, text, filelen + 1);
+	GayText_ScanTextFile(&tm, text, filelen);
 	cv_t processed_text;
 	cv_init(&processed_text, filelen);
 	//Replace tabs and blank lines with spaces to even out with
 	//the longest lines
 	GayText_PrepareText(&tm, text, filelen, &processed_text);
-
 	cv_t newgaytext;
 	cv_init(&newgaytext, filelen << 1);
-
-	GayText_MakeTextGay(&tm, processed_text.data, processed_text.length, &newgaytext, gayness);
+	printf("Max line len: %lu\n", tm.longest_line);
+	GayText_MakeTextGay(&tm, processed_text.data, processed_text.length,
+			&newgaytext, gayness);
 	printf("%s", newgaytext.data);
 
 	cv_destroy(&newgaytext);

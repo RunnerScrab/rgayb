@@ -12,10 +12,14 @@ struct GayText
 {
 	size_t longest_line;
 	size_t lines;
+	union rgb* color_table;
 };
 
 typedef enum {GAY = 0, SUPER_GAY, MEGA_GAY} TextGayness;
 
+void GayText_FreeColorTable(struct GayText* tm);
+void GayText_PopulateColorTable(struct GayText* tm, TextGayness gayness);
+int GayText_AllocateColorTable(struct GayText* tm, size_t length);
 void GayText_ScanTextFile(struct GayText* tm, const char* text, const size_t textlen);
 int GayText_MakeTextGay(struct GayText* tm, const char* text, const size_t textlen,
 			cv_t* out, TextGayness gayness);

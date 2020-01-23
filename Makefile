@@ -9,4 +9,3 @@ rgayb: $(OBJS)
 
 clean:
 	rm -f *.o rgayb
-
