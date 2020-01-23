@@ -89,7 +89,7 @@ int GayText_MakeTextGay(struct GayText* tm, const char* text, const size_t textl
 	GayText_AllocateColorTable(tm, tm->longest_line);
 	GayText_PopulateColorTable(tm, gayness);
 	union rgb* ct = tm->color_table;
-	for(; idx < textlen; ++idx, ++lineidx)
+	for(lineidx = 1; idx < textlen; ++idx, ++lineidx)
 	{
 		char ch = text[idx];
 		if(ch == '\n')

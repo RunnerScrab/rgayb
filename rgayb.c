@@ -89,7 +89,6 @@ int main(int argc, char** argv)
 	GayText_PrepareText(&tm, text, filelen, &processed_text);
 	cv_t newgaytext;
 	cv_init(&newgaytext, filelen << 1);
-	printf("Max line len: %lu\n", tm.longest_line);
 	GayText_MakeTextGay(&tm, processed_text.data, processed_text.length,
 			&newgaytext, gayness);
 	printf("%s", newgaytext.data);
