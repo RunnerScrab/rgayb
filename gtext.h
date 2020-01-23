@@ -10,8 +10,8 @@
 
 struct GayText
 {
-  size_t longest_line;
-  size_t lines;
+	size_t longest_line;
+	size_t lines;
 };
 
 typedef enum {GAY = 0, SUPER_GAY, MEGA_GAY} TextGayness;

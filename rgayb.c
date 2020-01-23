@@ -34,69 +34,69 @@
 
 int main(int argc, char** argv)
 {
-  TextGayness gayness = GAY;
-  FILE* fp = argc > 1 ? fopen(argv[1], "rb") : 0;
-  if(!fp)
-    {
-      const char* errormsg = "Too few arguments.\n";
-      write(2, errormsg, strlen(errormsg));
-      return -1;
-    }
-
-  if(argc > 2)
-    {
-      if(strstr(argv[2], "super"))
+	TextGayness gayness = GAY;
+	FILE* fp = argc > 1 ? fopen(argv[1], "rb") : 0;
+	if(!fp)
 	{
-	  gayness = SUPER_GAY;
+		const char* errormsg = "Too few arguments.\n";
+		write(2, errormsg, strlen(errormsg));
+		return -1;
 	}
-      else if(strstr(argv[2], "mega"))
+
+	if(argc > 2)
 	{
-	  gayness = MEGA_GAY;
+		if(strstr(argv[2], "super"))
+		{
+			gayness = SUPER_GAY;
+		}
+		else if(strstr(argv[2], "mega"))
+		{
+			gayness = MEGA_GAY;
+		}
 	}
-    }
 
-  fseek(fp, 0, SEEK_END);
-  size_t filelen = ftell(fp);
-  fseek(fp, 0, SEEK_SET);
+	fseek(fp, 0, SEEK_END);
+	size_t filelen = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
 
-  char* text = malloc(sizeof(char) * (filelen + 1));
-  if(!text)
-    {
-      const char* errormsg = "Couldn't allocate enough memory.\n";
-      write(2, errormsg, strlen(errormsg));
-      free(text);
-      return -1;
-    }
-  
-  if(fread(text, sizeof(char), filelen, fp) != filelen)
-    {
-      free(text);
-      const char* errormsg = "Error reading file.\n";
-      write(2, errormsg, strlen(errormsg));
-      return -1;
-    }
-  text[filelen + 1] = 0;
+	char* text = malloc(sizeof(char) * (filelen + 1));
+	if(!text)
+	{
+		const char* errormsg = "Couldn't allocate enough memory.\n";
+		write(2, errormsg, strlen(errormsg));
+		free(text);
+		return -1;
+	}
 
-  struct GayText tm;
-  memset(&tm, 0, sizeof(struct GayText));
+	if(fread(text, sizeof(char), filelen, fp) != filelen)
+	{
+		free(text);
+		const char* errormsg = "Error reading file.\n";
+		write(2, errormsg, strlen(errormsg));
+		return -1;
+	}
+	text[filelen + 1] = 0;
+
+	struct GayText tm;
+	memset(&tm, 0, sizeof(struct GayText));
 
 
-  GayText_ScanTextFile(&tm, text, filelen + 1);
-  cv_t processed_text;
-  cv_init(&processed_text, filelen);
-  //Replace tabs and blank lines with spaces to even out with
-  //the longest lines
-  GayText_PrepareText(&tm, text, filelen, &processed_text);
+	GayText_ScanTextFile(&tm, text, filelen + 1);
+	cv_t processed_text;
+	cv_init(&processed_text, filelen);
+	//Replace tabs and blank lines with spaces to even out with
+	//the longest lines
+	GayText_PrepareText(&tm, text, filelen, &processed_text);
 
-  cv_t newgaytext;
-  memset(&newgaytext, 0, sizeof(cv_t));
+	cv_t newgaytext;
+	memset(&newgaytext, 0, sizeof(cv_t));
 
-  GayText_MakeTextGay(&tm, processed_text.data, processed_text.length, &newgaytext, gayness);
-  printf("%s", newgaytext.data);
+	GayText_MakeTextGay(&tm, processed_text.data, processed_text.length, &newgaytext, gayness);
+	printf("%s", newgaytext.data);
 
-  cv_destroy(&newgaytext);
-  cv_destroy(&processed_text);
-  fclose(fp);
-  free(text);
-  return 0;
+	cv_destroy(&newgaytext);
+	cv_destroy(&processed_text);
+	fclose(fp);
+	free(text);
+	return 0;
 }

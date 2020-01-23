@@ -39,7 +39,7 @@ static inline __m128 _mm_min3_ps(__m128 a, __m128 b, __m128 c)
 
 static inline __m128 _mm_mod_ps(__m128 a, __m128 b)
 {
-  //Vector modulus division
+	//Vector modulus division
 	__m128 ftimes = _mm_cvtepi32_ps(_mm_cvttps_epi32(_mm_div_ps(a, b)));
 	return _mm_sub_ps(a, _mm_mul_ps(ftimes, b));
 }
@@ -55,14 +55,14 @@ static inline float hsvf(float n, float h)
 
 void hsv_to_rgb(union rgb* v, int max_steps, int step)
 {
-  #ifdef USESSE2
+#ifdef USESSE2
 	//On average ~3.4 times faster than the ordinary scalar version
-	//Performs calculations for r, g, and b channels simultaneously 
+	//Performs calculations for r, g, and b channels simultaneously
 	float angle = 360.f * ((float)step / (float)max_steps);
 	float h = ((float)angle) / 60.f;
 
 	__m128 vh = _mm_set_ps1(h);
-	
+
 	//The vector variables below (non const, non static) are
 	//actually put in .data by gcc, even with no optimization
 	//flags.  Not what I would expect, but w/e
@@ -75,7 +75,7 @@ void hsv_to_rgb(union rgb* v, int max_steps, int step)
 	__m128 vk = _mm_mod_ps(_mm_add_ps(vh, vn), _mm_set_ps1(6.f));
 
 	__m128 scale = _mm_max_ps(vzero,
-		_mm_min3_ps(vk, _mm_sub_ps(vfour, vk), vone));
+				_mm_min3_ps(vk, _mm_sub_ps(vfour, vk), vone));
 	float fresults[4];
 
 	_mm_store_ps(fresults, _mm_mul_ps(vff, _mm_sub_ps(vone, scale)));
@@ -83,11 +83,11 @@ void hsv_to_rgb(union rgb* v, int max_steps, int step)
 	v->components.r = (unsigned char) fresults[3];
 	v->components.g = (unsigned char) fresults[2];
 	v->components.b = (unsigned char) fresults[1];
-  #else
+#else
 	float angle = 360.f * ((float)step/(float)max_steps);
 	float h = ((float)angle) / 60.f;
 	v->components.r = (unsigned char) hsvf(5.f, h);
 	v->components.g = (unsigned char) hsvf(3.f, h);
 	v->components.b = (unsigned char) hsvf(1.f, h);
-  #endif
+#endif
 }
