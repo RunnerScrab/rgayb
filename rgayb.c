@@ -89,7 +89,7 @@ int main(int argc, char** argv)
 	GayText_PrepareText(&tm, text, filelen, &processed_text);
 
 	cv_t newgaytext;
-	memset(&newgaytext, 0, sizeof(cv_t));
+	cv_init(&newgaytext, filelen << 1);
 
 	GayText_MakeTextGay(&tm, processed_text.data, processed_text.length, &newgaytext, gayness);
 	printf("%s", newgaytext.data);

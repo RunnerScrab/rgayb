@@ -58,14 +58,12 @@ static int CreateANSI24BitCode(union rgb* color, TextGayness gayness, char* outp
 }
 
 int GayText_MakeTextGay(struct GayText* tm, const char* text, const size_t textlen,
-			cv_t* out, TextGayness gayness)
+			cv_t* output, TextGayness gayness)
 {
 	size_t idx = 0, lineidx = 0;
 	size_t longest_line = tm->longest_line;
 	char code[128] = {0};
 	int codelen = 0;
-	cv_t output;
-	cv_init(&output, textlen << 1);
 
 	for(; idx < textlen; ++idx, ++lineidx)
 	{
@@ -88,18 +86,17 @@ int GayText_MakeTextGay(struct GayText* tm, const char* text, const size_t textl
 		{
 			return -1;
 		}
-		cv_append(&output, code, codelen);
-		cv_push(&output, ch);
+		cv_append(output, code, codelen);
+		cv_push(output, ch);
 	}
 	//Reset terminal colors back to default
 	codelen = CreateANSIResetCode(code, 128);
-	cv_append(&output, code, codelen);
+	cv_append(output, code, codelen);
 	//We need a printing character following the reset code for it to actually
 	//take effect, apparently
-	cv_push(&output, '\n');
-	cv_push(&output, 0);
-	cv_copy(out, &output);
-	cv_destroy(&output);
+	cv_push(output, '\n');
+	cv_push(output, 0);
+
 	return 0;
 }
 
