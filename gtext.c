@@ -40,12 +40,12 @@ void GayText_ScanTextFile(struct GayText* tm, const char* text, const size_t tex
 	}
 }
 
-static int CreateANSIResetCode(char* output, size_t output_maxlen)
+int CreateANSIResetCode(char* output, size_t output_maxlen)
 {
 	return snprintf(output, output_maxlen, "\x1b[0m");
 }
 
-static int CreateANSI24BitCode(union rgb* color, TextGayness gayness, char* output, size_t output_maxlen)
+int CreateANSI24BitCode(union rgb* color, TextGayness gayness, char* output, size_t output_maxlen)
 {
 	switch(gayness)
 	{

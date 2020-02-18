@@ -25,5 +25,7 @@ int GayText_MakeTextGay(struct GayText* tm, const char* text, const size_t textl
 			cv_t* out, TextGayness gayness);
 //Change tabs to 3 spaces and fill blank lines with spaces
 void GayText_PrepareText(struct GayText* tm, const char* text, size_t textlen, cv_t* out);
+int CreateANSIResetCode(char* output, size_t output_maxlen);
+int CreateANSI24BitCode(union rgb* color, TextGayness gayness, char* output, size_t output_maxlen);
 
 #endif
