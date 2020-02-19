@@ -49,6 +49,8 @@ int main(int argc, char** argv)
 			CreateANSI24BitCode(&gt.color_table[idx%80], GAY, colorized, 256);
 			printf("%s%c", colorized, ch);
 		}
+		CreateANSIResetCode(colorized, 256);
+		printf("%s", colorized); //Reset terminal colors to default
 		GayText_FreeColorTable(&gt);
 		return 0;
 	}
